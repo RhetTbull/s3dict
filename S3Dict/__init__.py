@@ -16,7 +16,7 @@ class S3Dict(collections.UserDict):
         access_key_id=None,
         access_secret_key=None,
         file_name=None,
-        autosave = True,
+        autosave = False,
         data={},
     ):
         logger.debug(

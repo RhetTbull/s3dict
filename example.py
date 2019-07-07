@@ -32,7 +32,7 @@ if __name__ == "__main__":
         access_key_id=config["AWS_ACCESS_KEY_ID"],
         access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
         file_name="test.json",
-        autosave=False,
+#        autosave=False,
     )
     state["foo"] = "bar"
     print(f"foo: {state['foo']}")
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     print(len(state))
     state.clear()
     
-    state.autosave = True 
+#    state.autosave = True 
     state = state.fromkeys([1, 2, 3])
 
     print(state.pop(1))
