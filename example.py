@@ -32,6 +32,7 @@ if __name__ == "__main__":
         access_key_id=config["AWS_ACCESS_KEY_ID"],
         access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
         file_name="test.json",
+        autosave=False,
     )
     state["foo"] = "bar"
     print(f"foo: {state['foo']}")
@@ -58,13 +59,21 @@ if __name__ == "__main__":
 
     print(len(state))
     state.clear()
-
+    
+    state.autosave = True 
     state = state.fromkeys([1, 2, 3])
 
     print(state.pop(1))
     print(state.popitem())
     print(state.setdefault("42"))
     state.update({"a": "1", "b": 2, "c": 3})
-    state["foobar"] = "hahhah"
+    state["foobar"] = "BAR"
     print(state.values())
     print(f"keys = {state.keys()}")
+    state.save()
+
+    # test properties
+    print(state.file_name)
+    print(state.access_key_id)
+    print(state.access_secret_key)
+    print(state.bucket_name)

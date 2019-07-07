@@ -16,10 +16,11 @@ class S3Dict(collections.UserDict):
         access_key_id=None,
         access_secret_key=None,
         file_name=None,
+        autosave = True,
         data={},
     ):
         logger.debug(
-            f"__init__: {bucket_name} {access_key_id} {access_secret_key} {file_name} {data}"
+            f"__init__: {bucket_name} {access_key_id} {access_secret_key} {file_name} {autosave} {data}"
         )
         if (
             bucket_name == None
@@ -32,6 +33,7 @@ class S3Dict(collections.UserDict):
                 + f" access_secret_key ({access_secret_key}), and file_name ({file_name}) must be specified"
             )
 
+        self.__autosave = autosave
         self.__fname = file_name
         self.__BUCKET_NAME = bucket_name
         self.__AWS_ACCESS_KEY_ID = access_key_id
@@ -47,6 +49,36 @@ class S3Dict(collections.UserDict):
         self.__loadstate()
         self.data = data
         self.__savestate()
+
+    def save(self):
+        self.__savestate(True)
+
+    @property
+    def autosave(self):
+        return self.__autosave
+    
+    @autosave.setter
+    def autosave(self,val):
+        if isinstance(val,bool):
+            self.__autosave = val
+        else:
+            raise ValueError("autosave must be type bool")
+
+    @property
+    def file_name(self):
+        return self.__fname
+
+    @property
+    def access_key_id(self):
+        return self.__AWS_ACCESS_KEY_ID
+    
+    @property
+    def access_secret_key(self):
+        return self.__AWS_SECRET_ACCESS_KEY
+
+    @property
+    def bucket_name(self):
+        return self.__BUCKET_NAME
 
     def __loadstate(self):
         state = {}
@@ -79,7 +111,15 @@ class S3Dict(collections.UserDict):
 
         self.data = state
 
-    def __savestate(self):
+    def __savestate(self, savenow = False):
+        # Don't save unless savenow = True
+        # if autosave is True, always save
+        
+        savenow = savenow or self.__autosave
+        if not savenow:
+            logger.debug("skipping saving")
+            return 
+
         logger.debug("savestate")
         start = time.clock()
         try:
@@ -98,6 +138,7 @@ class S3Dict(collections.UserDict):
             access_key_id=self.__AWS_ACCESS_KEY_ID,
             access_secret_key=self.__AWS_SECRET_ACCESS_KEY,
             file_name=self.__fname,
+            autosave=self.__autosave,
             data=dict.fromkeys(*args),
         )
         return newdict
