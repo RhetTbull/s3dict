@@ -2,8 +2,6 @@ import collections
 import traceback
 import json
 
-import time
-
 from loguru import logger
 import boto3
 from botocore.client import Config
@@ -16,8 +14,8 @@ class S3Dict(collections.UserDict):
         access_key_id=None,
         access_secret_key=None,
         file_name=None,
-        autosave = False,
-        data={},
+        autosave=False,
+        data=None,
     ):
         logger.debug(
             f"__init__: {bucket_name} {access_key_id} {access_secret_key} {file_name} {autosave} {data}"
@@ -45,9 +43,10 @@ class S3Dict(collections.UserDict):
             config=Config(signature_version="s3v4"),
         )
 
-        # TODO: logic to either load state or preserve state depending on data
         self.__loadstate()
-        self.data = data
+        if data is not None:
+            # initialize with data that was passed to __init__
+            self.data = data
         self.__savestate()
 
     def save(self):
@@ -56,11 +55,14 @@ class S3Dict(collections.UserDict):
     @property
     def autosave(self):
         return self.__autosave
-    
+
     @autosave.setter
-    def autosave(self,val):
-        if isinstance(val,bool):
+    def autosave(self, val):
+        if isinstance(val, bool):
             self.__autosave = val
+            # if autosave turned on, save now
+            if self.__autosave:
+                self.save()
         else:
             raise ValueError("autosave must be type bool")
 
@@ -71,7 +73,7 @@ class S3Dict(collections.UserDict):
     @property
     def access_key_id(self):
         return self.__AWS_ACCESS_KEY_ID
-    
+
     @property
     def access_secret_key(self):
         return self.__AWS_SECRET_ACCESS_KEY
@@ -111,25 +113,21 @@ class S3Dict(collections.UserDict):
 
         self.data = state
 
-    def __savestate(self, savenow = False):
+    def __savestate(self, savenow=False):
         # Don't save unless savenow = True
         # if autosave is True, always save
-        
+
         savenow = savenow or self.__autosave
         if not savenow:
             logger.debug("skipping saving")
-            return 
+            return
 
         logger.debug("savestate")
-        start = time.clock()
         try:
             data = json.dumps(self.data)
             self.__s3.Bucket(self.__BUCKET_NAME).put_object(Key=self.__fname, Body=data)
         except:
             quit(f"Error saving state to {self.__s3}")
-        stop = time.clock()
-        elapsed = stop - start
-        logger.debug(f"elapsed: {elapsed}")
 
     def fromkeys(self, *args):
         logger.debug(f"fromkeys: {args}")

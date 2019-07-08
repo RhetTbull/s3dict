@@ -1,3 +1,13 @@
+"""
+    Example script to demonstrate use of S3Dict
+    To use this: you'll need to rename example.ini-sample to example.ini
+    and add your Amazon AWS user key and secret key along with bucket name
+    The load_config function will read example.ini to load your AWS credentials
+
+    Alternatively, you can pass the AWS credentials directly to the S3Dict constructor
+
+"""
+
 import configparser
 import traceback
 
@@ -7,6 +17,8 @@ import S3Dict
 
 
 def load_config(configfile):
+    """ Read config file in ini format to load AWS credentials and bucket name """
+
     config = configparser.ConfigParser()
     config.read(configfile)
 
@@ -26,54 +38,81 @@ def load_config(configfile):
 
 
 if __name__ == "__main__":
+
+    """ load credentials """
     config = load_config("example.ini")
+
+    """ create an instance of S3Dict """
     state = S3Dict.S3Dict(
         bucket_name=config["AWS_BUCKET_NAME"],
         access_key_id=config["AWS_ACCESS_KEY_ID"],
         access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
         file_name="test.json",
-#        autosave=False,
     )
+
+    """ assignment like any python dictionary """
     state["foo"] = "bar"
     print(f"foo: {state['foo']}")
 
-    if "foobar" in state:
-        print("Yep")
-    else:
-        print("Nope")
-
     state["foobar"] = 42
+
+    """  iteration """
     for k in state:
         print(f"k = {k}, {state[k]}")
 
     for k in state.keys():
         print(f"k = {k}, {state[k]}")
 
-    del (state["foobar"])
-
     for k, v in state.items():
         print(k, v)
 
-    state["foo"] = "bar"
-    state["answer"] = 42
+    """ remove a key """
+    del (state["foobar"])
 
     print(len(state))
-    state.clear()
-    
-#    state.autosave = True 
-    state = state.fromkeys([1, 2, 3])
 
-    print(state.pop(1))
-    print(state.popitem())
-    print(state.setdefault("42"))
-    state.update({"a": "1", "b": 2, "c": 3})
-    state["foobar"] = "BAR"
-    print(state.values())
-    print(f"keys = {state.keys()}")
+    """ clear all items """
+    state.clear()
+
+    """ set a value and save """
+    state["foo"] = "bar"
     state.save()
 
-    # test properties
-    print(state.file_name)
-    print(state.access_key_id)
-    print(state.access_secret_key)
-    print(state.bucket_name)
+    """ create a new instance fromkeys 
+        inherits settings from state """
+    state2 = state.fromkeys([1, 2, 3])
+
+    """ turn on autosave -- be sure you know what this will do!
+        autosave causes every update to the dict to be saved to S3 
+        this can be expensive in terms of run time and cost (Amazon charges for per PUT) """
+    state2.autosave = True
+
+    """ pop and popitem """
+    print(state2.pop(1))
+    print(state2.popitem())
+
+    """ setdefault """
+    print(state2.setdefault("42"))
+
+    """ update """
+    state2.update({"a": "1", "b": 2, "c": 3})
+    print(state2.values())
+
+    """ create an instance of S3Dict """
+    """ initialize with dict() """
+    state3 = S3Dict.S3Dict(
+        bucket_name=config["AWS_BUCKET_NAME"],
+        access_key_id=config["AWS_ACCESS_KEY_ID"],
+        access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
+        file_name="test.json",
+        data=dict(foo=42, bar=100),
+    )
+
+    print(state3)
+    state3.save()
+
+    """ access properties of the class """
+    print(state3.file_name)
+    print(state3.access_key_id)
+    print(state3.access_secret_key)
+    print(state3.bucket_name)

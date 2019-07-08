@@ -1,0 +1,8 @@
+# rename this file example.ini and replace REPLACEME123 below with your 
+# AWS access key, secret key, and bucket name
+
+[aws]
+ACCESS_KEY_ID = REPLACEME123
+ACCESS_SECRET_KEY = REPLACEME123
+BUCKET_NAME = REPLACEME123
+
