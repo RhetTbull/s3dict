@@ -55,7 +55,7 @@ S3Dict(bucket_name=AWS_BUCKET_NAME,
        [data={}])
 ```
 
-Construct a new S3Dict object
+Construct a new S3Dict object.  If `file_name` exists, restores state from file.  If file_name does not exist, creates it and initializes it with any data passed in `data` argument. 
     
 *Required arguments*
    - `bucket_name`: name of S3 bucket
