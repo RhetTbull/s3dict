@@ -12,8 +12,9 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="S3Dict",
-    version="0.01",
-    description="python dictionary class that saves its state in a json file on an Amazon S3 bucket",
+    version="0.02",
+    description="python dictionary class providing persistent storage by serializing"
+    + " state to a json file on an Amazon S3 bucket",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Rhet Turnbull",
