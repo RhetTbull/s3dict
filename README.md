@@ -12,6 +12,8 @@ Implements a persistent python dictionary class (inherited from collections.User
 
 S3Dict should be a drop-in replacement for a standard python dict
 
+If you think you need this module, you should probably look at [redis](https://redis.io) or something else.  S3Dict is simple and easy to use though if all you need is a persitent dictionary. With lazy saving (autosave=False), it's also very fast.
+
 Installation instructions
 -------------------------
 
