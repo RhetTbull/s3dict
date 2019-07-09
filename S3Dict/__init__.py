@@ -6,6 +6,7 @@ import json
 import boto3
 from botocore.client import Config
 
+
 class S3Dict(collections.UserDict):
     def __init__(
         self,
@@ -97,7 +98,10 @@ class S3Dict(collections.UserDict):
                 data = obj.get()["Body"].read()
                 state = json.loads(data)
             except Exception as e:
-                raise Exception(f"Error loading state from {self.__s3}: {e} {traceback.print_exc}",file=sys.stderr)
+                raise Exception(
+                    f"Error loading state from {self.__s3}: {e} {traceback.print_exc}",
+                    file=sys.stderr,
+                )
         else:
             try:
                 data = json.dumps(state)
@@ -105,7 +109,10 @@ class S3Dict(collections.UserDict):
                     Key=self.__fname, Body=data
                 )
             except Exception as e:
-                raise Exception(f"Error creating {self.__fname} {self.__s3}: {e} {traceback.print_exc}",file=sys.stderr)
+                raise Exception(
+                    f"Error creating {self.__fname} {self.__s3}: {e} {traceback.print_exc}",
+                    file=sys.stderr,
+                )
         self.data = state
 
     def __savestate(self, savenow=False):

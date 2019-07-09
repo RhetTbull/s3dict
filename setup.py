@@ -30,5 +30,5 @@ setup(
         "Programming Language :: Python",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    install_requires=["boto3","loguru"],
+    install_requires=["boto3", "loguru"],
 )
