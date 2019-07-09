@@ -8,9 +8,9 @@ S3Dict [Homepage](https://github.com/RhetTbull/s3dict)
 What is S3Dict?
 -----------------
 
-Implements a python dictionary class (inherited from collections.UserDict) that saves its state as
-a json file in Amazon AWS S3 buckets.  I built this as an experiment for saving state in a script
-run inside a Docker container.  
+Implements a persistent python dictionary class (inherited from collections.UserDict) that serializes its state as a json file in Amazon AWS S3 buckets.  I built this as an experiment for saving state in a script run inside a Docker container.  
+
+S3Dict should be a drop-in replacement for a standard python dict
 
 Installation instructions
 -------------------------
@@ -44,13 +44,64 @@ if __name__ == "__main__":
 
 See example.py for additional usage examples.
 
+Module Interface
+----------------
+```python
+S3Dict(bucket_name=AWS_BUCKET_NAME,
+       access_key_id=AWS_ACCESS_KEY_ID,
+       access_secret_key=AWS_ACCESS_SECRET_KEY,
+       file_name="filename.json",
+       [autosave=False],
+       [data={}])
+```
+
+Construct a new S3Dict object
+    
+*Required arguments*
+   - `bucket_name`: name of S3 bucket
+   - `acess_key_id`: AWS access key id
+   - `access_secret_key`: AWS secret key
+   - `file_name`: file name of the serialized dictionary to be stored in S3 bucket
+    
+*Optional arguments*
+   - `autosave`: must be `bool`, default is False -- setting this to True causes every update to the underlying dictionary to be immediately serialized to S3
+   - `data`: python dictionary used to initialize data
+
+```python
+S3Dict.save()
+```
+
+Force state to be serialized to S3 bucket
+
+```python
+S3Dict.load()
+```
+
+Force state to be immediately loaded from S3 bucket.  In normal circumstances, you won't need to do this.  It might be useful if an external processes updates the state information and you want to force a reload. 
+
+```python
+S3Dict.autosave = True|False
+S3Dict.autosave
+```
+
+Turn autosave on (True) or off (False). Also a property to read autosave value
+
+```python
+S3Dict.file_name
+S3Dict.access_key_id
+S3Dict.access_secret_key
+S3Dict.bucket_name
+```
+
+Read only properties
+
+
 Usage Notes
 -----------
 
 To use S3Dict, you must first create an Amazon S3 bucket and a user with permissions to access the bucket.
 I highly recommend [Keith Weaver's](https://github.com/keithweaver) excellent [tutorial](https://github.com/keithweaver/python-aws-s3) on using AWS S3 with python and setting up buckets and users.
 
-Be careful with ```autosave``` as it could cost you money--if your underlying dict changes a lot, autosave will
-cause S3Dict to pound your S3 account with frequent PUT commands which will rack up charges.
+Be careful with ```autosave``` as it could cost you money--if your underlying dict changes a lot, autosave will cause S3Dict to pound your S3 account with frequent PUT commands which could result in charges.  It is also costly in terms of execution speed as every change to the underlying dictionary forces an interaction with the S3 server.
 
 

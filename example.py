@@ -111,6 +111,11 @@ if __name__ == "__main__":
     print(state3)
     state3.save()
 
+    """ manually change test.json on S3 bucket then check to see it got re-loaded """
+    input("Press enter to continue")
+    state3.load()
+    print(state3)
+
     """ access properties of the class """
     print(state3.file_name)
     print(state3.access_key_id)
