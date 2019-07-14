@@ -102,6 +102,20 @@ S3Dict.bucket_name
 
 Read only properties
 
+```python
+S3Dict.delete()
+```
+
+Clear the stored data and deletes the json file from S3.  The user must have S3 DeleteObject permissions.  This does not delete the actual S3Dict object instance.  To do that, follow call S3Dict.delete() with del. 
+
+```python
+from s3dictionary import S3Dict
+
+mys3dict = S3Dict(...)
+...
+mys3dict.delete() # deletes the data and the file
+del mys3dict # deletes the object
+```
 
 Usage Notes
 -----------
@@ -112,6 +126,3 @@ I highly recommend [Keith Weaver's](https://github.com/keithweaver) excellent [t
 
 Be careful with ```autosave``` as it could cost you money--if your underlying dict changes a lot, autosave will cause S3Dict to pound your S3 account with frequent PUT commands which could result in charges.  It is also costly in terms of execution speed as every change to the underlying dictionary forces an interaction with the S3 server.
 
-TODO
-----
-Implement a method to delete the dictionary and the json file from the S3 bucket

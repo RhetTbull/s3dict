@@ -1,6 +1,7 @@
 import collections
 import traceback
 import json
+import sys
 
 # from loguru import logger
 import boto3
@@ -56,6 +57,16 @@ class S3Dict(collections.UserDict):
         """ force state to be loaded from S3 """
         self.__loadstate()
 
+    def delete(self):
+        """ delete all data as well as the json file on S3 """
+        self.data = {}
+        try:
+            self.__s3.Object(self.__BUCKET_NAME, self.__fname).delete()
+        except Exception as e:
+            raise Exception(
+                f"Error deleting state from {self.__s3}: {e} {traceback.print_exc}"
+            )
+
     @property
     def autosave(self):
         return self.__autosave
@@ -86,7 +97,7 @@ class S3Dict(collections.UserDict):
     def bucket_name(self):
         return self.__BUCKET_NAME
 
-    def __loadstate(self, default = None):
+    def __loadstate(self, default=None):
         """ loads state from json file 
             if file does not exist, initialize data, set to default if provided """
 
@@ -98,11 +109,10 @@ class S3Dict(collections.UserDict):
             try:
                 obj = self.__s3.Object(self.__BUCKET_NAME, self.__fname)
                 data = obj.get()["Body"].read()
-                self.data = json.loads(data) 
+                self.data = json.loads(data)
             except Exception as e:
                 raise Exception(
-                    f"Error loading state from {self.__s3}: {e} {traceback.print_exc}",
-                    file=sys.stderr,
+                    f"Error loading state from {self.__s3}: {e} {traceback.print_exc}"
                 )
         elif default is not None:
             """ File does not exist but default data provided """
@@ -119,8 +129,7 @@ class S3Dict(collections.UserDict):
         #         )
         #     except Exception as e:
         #         raise Exception(
-        #             f"Error creating {self.__fname} {self.__s3}: {e} {traceback.print_exc}",
-        #             file=sys.stderr,
+        #             f"Error creating {self.__fname} {self.__s3}: {e} {traceback.print_exc}"
         #         )
 
     def __savestate(self, savenow=False):

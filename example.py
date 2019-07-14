@@ -15,6 +15,7 @@ from loguru import logger
 
 from s3dictionary import S3Dict
 
+
 def load_config(configfile):
     """ Read config file in ini format to load AWS credentials and bucket name """
 
@@ -123,7 +124,7 @@ if __name__ == "__main__":
         access_key_id=config["AWS_ACCESS_KEY_ID"],
         access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
         file_name="test4.json",
-        default = {'a': 1, 'b': 2, 'c': 3}
+        default={"a": 1, "b": 2, "c": 3},
     )
 
     print(state4)
@@ -141,7 +142,7 @@ if __name__ == "__main__":
         access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
         file_name="test/test5.json",
         autosave=True,
-        default = {'x': 1, 'y': 2, 'z': 3}
+        default={"x": 1, "y": 2, "z": 3},
     )
 
     state5.load()
@@ -152,3 +153,12 @@ if __name__ == "__main__":
     print(state5.access_key_id)
     print(state5.access_secret_key)
     print(state5.bucket_name)
+
+    """ delete the dictionary """
+    """ policy for user and bucket must be set so user has S3:DeleteObject permissions or this raises an exception """
+    state5.delete()
+    del state5
+    try:
+        print(state5["x"])
+    except Exception as e:
+        print(f"Error accessing state5: {e}")
