@@ -8,11 +8,12 @@ S3Dict [Homepage](https://github.com/RhetTbull/s3dict)
 What is S3Dict?
 -----------------
 
-Implements a persistent python dictionary class (inherited from collections.UserDict) that serializes its state as a json file in Amazon AWS S3 buckets.  I built this as an experiment for saving state in a script run inside a Docker container.  
+Implements a persistent python dictionary class (inherited from collections.UserDict) that serializes its state as a json file in an Amazon AWS S3 bucket.  I built this as an experiment for saving state in a script run inside a Docker container.  This works well for simple persistence if all you need is to save some key/value pairs.   
 
-S3Dict should be a drop-in replacement for a standard python dict
+S3Dict should be a drop-in replacement for a standard python dict.
 
-If you think you need this module, you should probably look at [redis](https://redis.io) or something else.  S3Dict is simple and easy to use though if all you need is a persitent dictionary. With lazy saving (autosave=False), it's also very fast.
+If you think you need this module, you probably need something else. S3Dict is simple and easy to use though if all you need is a persitent dictionary. With lazy saving (autosave=False), it's also reasonably fast.
+
 
 Installation instructions
 -------------------------
@@ -54,10 +55,13 @@ S3Dict(bucket_name=AWS_BUCKET_NAME,
        access_secret_key=AWS_ACCESS_SECRET_KEY,
        file_name="filename.json",
        [autosave=False],
-       [data={}])
+       [data=None]),
+       [default=None],
 ```
 
-Construct a new S3Dict object.  If `file_name` exists, restores state from file.  If file_name does not exist, creates it and initializes it with any data passed in `data` argument. 
+Construct a new S3Dict object.  If `file_name` exists, restores state from file.  If file_name does not exist, initialize a new dictionary.  In the case the file does not already exist, it will not be created in the S3 bucket until you call `save()` unless `autosave=True`.    
+
+If a dictionary is passed in `data` the dictionary will be initialized with what was passed in `data`.  This will overwrite any data that was loaded from file. If a dictionary is passed in `default` and the file does not exist, the dictionary will be initialized with what was passed in `default`.  Unlike the `data` argument, `default` will not overwrite any existing data.
     
 *Required arguments*
    - `bucket_name`: name of S3 bucket
@@ -68,6 +72,7 @@ Construct a new S3Dict object.  If `file_name` exists, restores state from file.
 *Optional arguments*
    - `autosave`: must be `bool`, default is False -- setting this to True causes every update to the underlying dictionary to be immediately serialized to S3
    - `data`: python dictionary used to initialize data
+   - `default`: python dictionary used to initialize data if the file does not already exist in the S3 bucket
 
 ```python
 S3Dict.save()
@@ -86,7 +91,7 @@ S3Dict.autosave = True|False
 S3Dict.autosave
 ```
 
-Turn autosave on (True) or off (False). Also a property to read autosave value
+Turn autosave on (True) or off (False). Also a property to read autosave value.  If `autosave` is `True`, every update to the dictionary will immediately be serialized back to the S3 bucket.  Please be sure you understand what this means before turning `autosave` on!
 
 ```python
 S3Dict.file_name

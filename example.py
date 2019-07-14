@@ -116,6 +116,36 @@ if __name__ == "__main__":
     state3.load()
     print(state3)
 
+    """ create an instance of S3Dict """
+    """ initialize with default if file not found """
+    state3 = S3Dict.S3Dict(
+        bucket_name=config["AWS_BUCKET_NAME"],
+        access_key_id=config["AWS_ACCESS_KEY_ID"],
+        access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
+        file_name="test3.json",
+        default = {'a': 1, 'b': 2, 'c': 3}
+    )
+
+    print(state3)
+    state3.save()
+    state3.load()
+    print(state3)
+
+    """ create an instance of S3Dict """
+    """ initialize with default if file not found """
+    """ set autosave=True to force immediate write """
+    state3 = S3Dict.S3Dict(
+        bucket_name=config["AWS_BUCKET_NAME"],
+        access_key_id=config["AWS_ACCESS_KEY_ID"],
+        access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
+        file_name="test4.json",
+        autosave=True,
+        default = {'x': 1, 'y': 2, 'z': 3}
+    )
+
+    state3.load()
+    print(state3)
+
     """ access properties of the class """
     print(state3.file_name)
     print(state3.access_key_id)

@@ -15,6 +15,7 @@ class S3Dict(collections.UserDict):
         access_secret_key=None,
         file_name=None,
         autosave=False,
+        default=None,
         data=None,
     ):
         if (
@@ -40,7 +41,8 @@ class S3Dict(collections.UserDict):
             config=Config(signature_version="s3v4"),
         )
 
-        self.__loadstate()
+        self.data = {}
+        self.__loadstate(default=default)
         if data is not None:
             # initialize with data that was passed to __init__
             self.data = data
@@ -84,36 +86,42 @@ class S3Dict(collections.UserDict):
     def bucket_name(self):
         return self.__BUCKET_NAME
 
-    def __loadstate(self):
+    def __loadstate(self, default = None):
         """ loads state from json file 
-            if file does not exists, creates the file """
-        # TODO: might be better if __loadstate only loads and does not create the file if needed
-        state = {}
+            if file does not exist, initialize data, set to default if provided """
+
         objs = self.__s3.Bucket(self.__BUCKET_NAME).objects.all()
         fnames = list(map(lambda x: x.key, objs))
 
         if self.__fname in fnames:
+            """ File exists, load it """
             try:
                 obj = self.__s3.Object(self.__BUCKET_NAME, self.__fname)
                 data = obj.get()["Body"].read()
-                state = json.loads(data)
+                self.data = json.loads(data) 
             except Exception as e:
                 raise Exception(
                     f"Error loading state from {self.__s3}: {e} {traceback.print_exc}",
                     file=sys.stderr,
                 )
+        elif default is not None:
+            """ File does not exist but default data provided """
+            self.data = default
         else:
-            try:
-                data = json.dumps(state)
-                self.__s3.Bucket(self.__BUCKET_NAME).put_object(
-                    Key=self.__fname, Body=data
-                )
-            except Exception as e:
-                raise Exception(
-                    f"Error creating {self.__fname} {self.__s3}: {e} {traceback.print_exc}",
-                    file=sys.stderr,
-                )
-        self.data = state
+            """ No file, no default data: init to empty dictionary """
+            self.data = {}
+
+        # else:
+        #     try:
+        #         data = json.dumps(state)
+        #         self.__s3.Bucket(self.__BUCKET_NAME).put_object(
+        #             Key=self.__fname, Body=data
+        #         )
+        #     except Exception as e:
+        #         raise Exception(
+        #             f"Error creating {self.__fname} {self.__s3}: {e} {traceback.print_exc}",
+        #             file=sys.stderr,
+        #         )
 
     def __savestate(self, savenow=False):
         # Don't save unless savenow = True
