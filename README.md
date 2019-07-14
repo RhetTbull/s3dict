@@ -8,7 +8,7 @@ S3Dictionary [Homepage](https://github.com/RhetTbull/s3dict)
 What is S3Dictionary?
 -----------------
 
-Implements a persistent python dictionary class (inherited from collections.UserDict) that serializes its state as a json file in an Amazon AWS S3 bucket.  I built this as an experiment for saving state in a script run inside a Docker container.  This works well for simple persistence if all you need is to save some key/value pairs.   
+Implements a persistent python dictionary class (inherited from collections.UserDict) that serializes its state as a json file in an Amazon AWS S3 bucket.  This works well for simple persistence if all you need is to save some key/value pairs.   
 
 S3Dictionary should be a drop-in replacement for a standard python dict.
 
