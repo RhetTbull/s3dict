@@ -11,8 +11,8 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name="S3Dict",
-    version="0.07",
+    name="S3Dictionary",
+    version="0.10",
     description="python dictionary class providing persistent storage by serializing"
     + " state to a json file on an Amazon S3 bucket",
     long_description=long_description,
@@ -22,7 +22,7 @@ setup(
     url="https://github.com/RhetTbull/",
     project_urls={"GitHub": "https://github.com/RhetTbull/s3dict"},
     download_url="https://github.com/RhetTbull/s3dict",
-    packages=["S3Dict"],
+    packages=["s3dictionary"],
     license="License :: OSI Approved :: MIT License",
     classifiers=[
         "Development Status :: 4 - Beta",

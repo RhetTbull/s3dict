@@ -13,8 +13,7 @@ import traceback
 
 from loguru import logger
 
-import S3Dict
-
+from s3dictionary import S3Dict
 
 def load_config(configfile):
     """ Read config file in ini format to load AWS credentials and bucket name """
@@ -43,7 +42,7 @@ if __name__ == "__main__":
     config = load_config("example.ini")
 
     """ create an instance of S3Dict """
-    state = S3Dict.S3Dict(
+    state = S3Dict(
         bucket_name=config["AWS_BUCKET_NAME"],
         access_key_id=config["AWS_ACCESS_KEY_ID"],
         access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
@@ -55,6 +54,7 @@ if __name__ == "__main__":
     print(f"foo: {state['foo']}")
 
     state["foobar"] = 42
+    print(f"foobar: {state['foobar']}")
 
     """  iteration """
     for k in state:
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     """ turn on autosave -- be sure you know what this will do!
         autosave causes every update to the dict to be saved to S3 
-        this can be expensive in terms of run time and cost (Amazon charges for per PUT) """
+        this can be expensive in terms of run time and cost (Amazon charges per PUT) """
     state2.autosave = True
 
     """ pop and popitem """
@@ -100,54 +100,55 @@ if __name__ == "__main__":
 
     """ create an instance of S3Dict """
     """ initialize with dict() """
-    state3 = S3Dict.S3Dict(
+    state3 = S3Dict(
         bucket_name=config["AWS_BUCKET_NAME"],
         access_key_id=config["AWS_ACCESS_KEY_ID"],
         access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
-        file_name="test.json",
+        file_name="test3.json",
         data=dict(foo=42, bar=100),
     )
 
     print(state3)
     state3.save()
 
-    """ manually change test.json on S3 bucket then check to see it got re-loaded """
+    """ manually change test3.json on S3 bucket then check to see it got re-loaded """
     input("Press enter to continue")
     state3.load()
     print(state3)
 
     """ create an instance of S3Dict """
     """ initialize with default if file not found """
-    state3 = S3Dict.S3Dict(
-        bucket_name=config["AWS_BUCKET_NAME"],
-        access_key_id=config["AWS_ACCESS_KEY_ID"],
-        access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
-        file_name="test3.json",
-        default = {'a': 1, 'b': 2, 'c': 3}
-    )
-
-    print(state3)
-    state3.save()
-    state3.load()
-    print(state3)
-
-    """ create an instance of S3Dict """
-    """ initialize with default if file not found """
-    """ set autosave=True to force immediate write """
-    state3 = S3Dict.S3Dict(
+    state4 = S3Dict(
         bucket_name=config["AWS_BUCKET_NAME"],
         access_key_id=config["AWS_ACCESS_KEY_ID"],
         access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
         file_name="test4.json",
+        default = {'a': 1, 'b': 2, 'c': 3}
+    )
+
+    print(state4)
+    state4.save()
+    state4.load()
+    print(state4)
+
+    """ create an instance of S3Dict """
+    """ initialize with default if file not found """
+    """ set autosave=True to force immediate write """
+    """ store the file in a folder in the bucket """
+    state5 = S3Dict(
+        bucket_name=config["AWS_BUCKET_NAME"],
+        access_key_id=config["AWS_ACCESS_KEY_ID"],
+        access_secret_key=config["AWS_ACCESS_SECRET_KEY"],
+        file_name="test/test5.json",
         autosave=True,
         default = {'x': 1, 'y': 2, 'z': 3}
     )
 
-    state3.load()
-    print(state3)
+    state5.load()
+    print(state5)
 
     """ access properties of the class """
-    print(state3.file_name)
-    print(state3.access_key_id)
-    print(state3.access_secret_key)
-    print(state3.bucket_name)
+    print(state5.file_name)
+    print(state5.access_key_id)
+    print(state5.access_secret_key)
+    print(state5.bucket_name)
