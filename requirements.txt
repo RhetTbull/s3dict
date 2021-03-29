@@ -14,7 +14,7 @@ jmespath==0.9.4
 loguru==0.2.5
 pipx==0.13.1.1
 pycparser==2.19
-Pygments==2.4.2
+Pygments==2.7.4
 pyOpenSSL==19.0.0
 PySocks==1.7.0
 python-dateutil==2.8.0
